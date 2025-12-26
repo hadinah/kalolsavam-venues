@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Event Map</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="map-wrapper">
+    <!-- Base Map Image -->
+    <img src="event-map.png" alt="Event Map">
+
+    <!-- SVG Layer for Zones, Landmarks, User Marker -->
+    <svg id="svgMap" preserveAspectRatio="xMidYMid meet">
+      <!-- Zones will be injected here -->
+      <g id="zonesLayer"></g>
+      <!-- Landmarks will be injected here -->
+      <g id="landmarksLayer"></g>
+      <!-- User marker will be injected here -->
+      <g id="userLayer"></g>
+    </svg>
+  </div>
+
+  <!-- Tooltip for zone descriptions -->
+  <div id="tooltip" class="tooltip" style="display:none;"></div>
+
+  <!-- JS Files -->
+  <script src="js/config.js"></script>
+  <script src="js/geo.js"></script>
+  <script src="js/zones.js"></script>
+  <script src="js/landmarks.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
+

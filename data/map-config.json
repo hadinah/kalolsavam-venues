@@ -1,0 +1,15 @@
+{
+  "image": {
+    "width": 1920,
+    "height": 1080,
+    "lat_top": 12.570617329756326,
+    "lat_bottom": 12.568079001666757,
+    "lng_left": 74.95188110090619,
+    "lng_right": 74.95654306573417
+  },
+  "ui": {
+    "showAccuracy": true,
+    "pulse": true
+  }
+}
+

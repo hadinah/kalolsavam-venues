@@ -1,0 +1,97 @@
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+.map-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+}
+
+.map-wrapper img,
+.map-wrapper svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ZONES */
+.zone {
+  cursor: pointer;
+  stroke-width: 4;
+  transition: fill 0.2s, stroke-width 0.2s;
+}
+
+.zone:hover {
+  fill-opacity: 0.6 !important;
+  stroke-width: 6;
+}
+
+/* Tooltip styling */
+.tooltip {
+  position: absolute;
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  pointer-events: none;
+  font-size: 14px;
+  white-space: nowrap;
+  z-index: 1000;
+  font-family: Arial, sans-serif;
+}
+
+/* LABELS */
+.zone-label {
+  fill: #fff;
+  font-size: 22px;
+  font-weight: bold;
+  pointer-events: none;
+  text-shadow: 0 0 6px #000;
+}
+
+.user-label {
+  fill: #007bff;
+  font-size: 16px;
+  font-weight: 600;
+  text-shadow: 0 0 6px rgba(0,0,0,0.6);
+  pointer-events: none;
+}
+
+/* LANDMARKS */
+.landmark {
+  fill: #ffcc00;
+  stroke: #000;
+  stroke-width: 2;
+}
+
+.landmark-label {
+  fill: #ffeb99;
+  font-size: 18px;
+  pointer-events: none;
+  text-shadow: 0 0 6px #000;
+}
+
+#pulse {
+  fill: none;
+  stroke: #007bff;
+  stroke-width: 3;
+  animation: pulse 1.8s infinite;
+}
+
+#accuracy {
+  fill: rgba(0,123,255,0.15);
+}
+
+@keyframes pulse {
+  0% { r: 10; opacity: 0.8; }
+  100% { r: 30; opacity: 0; }
+}
+
