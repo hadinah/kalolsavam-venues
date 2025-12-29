@@ -4,28 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Event Map</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css" />
 </head>
+
 <body>
   <div class="map-wrapper">
-    <!-- Base Map Image -->
     <img src="event-map.png" alt="Event Map">
 
-    <!-- SVG Layer for Zones, Landmarks, User Marker -->
     <svg id="svgMap" preserveAspectRatio="xMidYMid meet">
-      <!-- Zones will be injected here -->
       <g id="zonesLayer"></g>
-      <!-- Landmarks will be injected here -->
       <g id="landmarksLayer"></g>
-      <!-- User marker will be injected here -->
       <g id="userLayer"></g>
     </svg>
   </div>
 
-  <!-- Tooltip for zone descriptions -->
-  <div id="tooltip" class="tooltip" style="display:none;"></div>
+  <!-- Directional pointers -->
+  <div id="pointer-overlay"></div>
 
-  <!-- JS Files -->
+  <!-- Center on Me button -->
+  <button id="center-btn">Center on Me</button>
+
+  <!-- JS files -->
   <script src="js/config.js"></script>
   <script src="js/geo.js"></script>
   <script src="js/zones.js"></script>
@@ -33,4 +32,3 @@
   <script src="js/main.js"></script>
 </body>
 </html>
-
