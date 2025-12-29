@@ -7,6 +7,7 @@ let viewBoxZoom = 1.0;
 
 // Setup the map
 async function init() {
+  loadConfig();
   const res = await fetch("data/map-config.json");
   const config = await res.json();
   window.MAP = config;
