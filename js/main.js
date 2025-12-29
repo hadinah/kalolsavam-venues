@@ -1,63 +1,109 @@
-function startGPS() {
-  const marker = document.getElementById("userMarker");
-  if (!marker) return;
+// === main.js ===
 
-  navigator.geolocation.watchPosition(
-    pos => {
-      const { x, y } = latLngToPixel(
-        pos.coords.latitude,
-        pos.coords.longitude
-      );
+let userMarker;
+let userPos = null;
+let isCentered = true;
+let viewBoxZoom = 1.0;
 
-      marker.setAttribute("transform", `translate(${x},${y})`);
-    },
-    () => alert("Location access required"),
-    { enableHighAccuracy: true }
-  );
-}
+// Setup the map
+async function init() {
+  const res = await fetch("data/map-config.json");
+  const config = await res.json();
+  window.MAP = config;
+  const svg = document.getElementById("svgMap");
+  svg.setAttribute("viewBox", `0 0 ${MAP.image.width} ${MAP.image.height}`);
 
-(async function init() {
-  await loadConfig();
+  // Load layers
   await loadZones();
   await loadLandmarks();
-  createUserMarker();
-  startGPS();
-})();
 
-function createUserMarker() {
-  const layer = document.getElementById("userLayer");
+  setupUserMarker();
+  watchUserPosition();
 
-  // Clear old marker if any
-  layer.innerHTML = "";
+  // Center button
+  document.getElementById("center-btn").addEventListener("click", () => {
+    isCentered = true;
+    if (userPos) centerOnUser();
+  });
 
-  // Group to move everything together
-  const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-  group.setAttribute("id", "userMarker");
-
-  /* --- PIN --- */
-  const pin = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  pin.setAttribute(
-    "d",
-    "M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7z M12 11.5c-1.4 0-2.5-1.1-2.5-2.5S10.6 6.5 12 6.5 14.5 7.6 14.5 9 13.4 11.5 12 11.5z"
-  );
-  pin.setAttribute("fill", "#007bff");
-  pin.setAttribute("stroke", "white");
-  pin.setAttribute("stroke-width", "2.5");
-  pin.setAttribute("transform", "translate(-12,-30) scale(2)");
-
-  /* --- LABEL --- */
-  const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-  label.textContent = "You are here";
-  label.setAttribute("x", 0);
-  label.setAttribute("y", 30); // BELOW pin tip
-  label.setAttribute("stroke", "black");
-  label.setAttribute("stroke-width", "0.4");
-  label.setAttribute("text-anchor", "middle");
-  label.setAttribute("class", "user-label");
-
-  group.appendChild(pin);
-  group.appendChild(label);
-  layer.appendChild(group);
+  // Update pointers periodically
+  setInterval(updatePointers, 1000);
 }
 
+function setupUserMarker() {
+  const layer = document.getElementById("userLayer");
+  userMarker = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  userMarker.setAttribute("id", "userMarker");
+  userMarker.setAttribute("r", 10);
+  userMarker.setAttribute("fill", "#007bff");
+  layer.appendChild(userMarker);
+}
 
+function watchUserPosition() {
+  if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(
+      pos => {
+        const { latitude, longitude } = pos.coords;
+        userPos = { lat: latitude, lng: longitude };
+        const pixel = latLngToPixel(latitude, longitude);
+        userMarker.setAttribute("cx", pixel.x);
+        userMarker.setAttribute("cy", pixel.y);
+        if (isCentered) centerOnUser();
+      },
+      err => console.error("Geolocation error:", err),
+      { enableHighAccuracy: true }
+    );
+  }
+}
+
+function centerOnUser() {
+  if (!userPos) return;
+  const svg = document.getElementById("svgMap");
+  const { width, height } = MAP.image;
+  const pixel = latLngToPixel(userPos.lat, userPos.lng);
+
+  const zoom = viewBoxZoom;
+  const viewW = width / zoom;
+  const viewH = height / zoom;
+
+  const x = pixel.x - viewW / 2;
+  const y = pixel.y - viewH / 2;
+  svg.setAttribute("viewBox", `${x} ${y} ${viewW} ${viewH}`);
+}
+
+// === Directional Pointers ===
+function updatePointers() {
+  const overlay = document.getElementById("pointer-overlay");
+  overlay.innerHTML = "";
+
+  const svg = document.getElementById("svgMap");
+  const vb = svg.getAttribute("viewBox").split(" ").map(Number);
+  const [x, y, w, h] = vb;
+
+  const zones = document.querySelectorAll("#zonesLayer polygon, #zonesLayer path");
+  zones.forEach(zone => {
+    const bbox = zone.getBBox();
+    const center = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2 };
+
+    // Check if inside viewport
+    const inside = center.x >= x && center.x <= x + w && center.y >= y && center.y <= y + h;
+    if (!inside) {
+      const angle = Math.atan2(center.y - (y + h / 2), center.x - (x + w / 2));
+      const pointer = document.createElement("div");
+      pointer.className = "pointer";
+      pointer.textContent = "➤";
+      pointer.style.transform = `rotate(${angle * 180 / Math.PI}deg)`;
+
+      // Position pointer near edge of screen
+      const edgeDist = 45;
+      const screenX = window.innerWidth / 2 + Math.cos(angle) * (window.innerWidth / 2 - edgeDist);
+      const screenY = window.innerHeight / 2 + Math.sin(angle) * (window.innerHeight / 2 - edgeDist);
+
+      pointer.style.left = `${screenX}px`;
+      pointer.style.top = `${screenY}px`;
+      overlay.appendChild(pointer);
+    }
+  });
+}
+
+init();
